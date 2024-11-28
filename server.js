@@ -18,7 +18,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 */
 
-
+console.log('render 3 demarré');
 
 let ValMode = 1;
 
