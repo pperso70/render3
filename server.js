@@ -68,8 +68,8 @@ wss.on("connection", (ws) => {
             }
             // Vérifier si temperature existe
             if (data.temperature !== undefined) {
-                //console.log("data.temperature:", data.temperature);
-                //console.log("data.position:", data.position);
+                console.log("data.temperature:", data.temperature);
+                console.log("data.position:", data.position);
                 //console.log("mode:", ValMode);
                 const currentTime2 = Date.now();
                 if (currentTime2 - lastAddDataTime >= 10000) { //10000 delai acquistion 10s
