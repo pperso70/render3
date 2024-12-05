@@ -51,7 +51,7 @@ class DataTable {
 const dataTable = new DataTable(8640); 
 let lastDataTableSendTime = Date.now(); // Temps du dernier envoi de la DataTable
 let lastAddDataTime = Date.now(); // Temps du dernier envoi de la DataTable
-const DATA_TABLE_INTERVAL = 10000; // 10 secondes
+const DATA_TABLE_INTERVAL = 2000; // 10 secondes
 
 wss.on("connection", (ws) => {
     console.log("Nouvelle connexion établie");
