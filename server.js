@@ -5,9 +5,14 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 let ValMode = 1;
+const path = require("path");
+
+//app.get("/", (req, res) => {
+//    res.send("Serveur WebSocket actif");
+//});
 
 app.get("/", (req, res) => {
-    res.send("Serveur WebSocket actif");
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 class DataTable {
