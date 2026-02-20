@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Render Mvd</title>
+
+  <link rel="icon"
+    href="data:image/x-icon;base64,AAABAAMAEBAAAAAAIADxAAAANgAAABgYAAAAACAANgEAACcBAAAgIAAAAAAgAGMBAABdAgAAiVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAYFBMVEX///8AAAACAgL5+fnCwsIZGRl6enqurq6UlJRycnLf399/f3/Q0NCZmZnw8PBiYmJSUlJAQEDW1tYjIyPo6OhKSkq1tbXKysoQEBA2Nja8vLwqKiqKioqioqJoaGhYWFgzrPrAAAAATElEQVR4nGNgwAQi0kKSPIwMPAxiED4jFPIyyKAKCAOhILIQNxAyUEuAg4EJDhnRVTDzIwnIIAQQACzAxcUE4wuBmYyMjCAMpTD9DgBidQI7NPq+KAAAAABJRU5ErkJggolQTkcNChoKAAAADUlIRFIAAAAYAAAAGAgDAAAA16nNygAAAGBQTFRF////AAAAAgIC+fn5wsLCGRkZenp6rq6ulJSUcnJy39/ff39/0NDQmZmZ8PDwYmJiUlJSQEBA1tbWIyMj6OjoSkpKtbW1ysrKEBAQNjY2vLy8KioqioqKoqKiaGhoWFhYM6z6wAAAAJFJREFUeJzVkMEOwyAMQ+30skGrqu3UUcH/f+cgsEKptPssK4r85BwC/NIT2AAHWMDrXvTyO44R5Doe2P2Ze1BAFwEcIURBjLZqYiICNUpgAb2a2NQLv8fOhlVX/RN4xDfIxZxuLykNLc0YejDEsIKQQLiC2JR8UhepjU4ZiDFG2ljWHLy11WguIZPybNb+etUHYQcGOdnieegAAAAASUVORK5CYIKJUE5HDQoaCgAAAA1JSERSAAAAIAAAACAIAwAAAESkisYAAABgUExURf///wAAAAICAvn5+cLCwhkZGXp6eq6urpSUlHJyct/f339/f9DQ0JmZmfDw8GJiYlJSUkBAQNbW1iMjI+jo6EpKSrW1tcrKyhAQEDY2Nry8vCoqKoqKiqKiomhoaFhYWDOs+sAAAAC+SURBVHic7ZFRC4MwDIQv9WWuWrGKUyr7/z9zaZtWq+5h4OMOPqTJ5RIQuEf1ENEzMGvA1cDw3hlGuMliaRoQwTYL7OS4mOUAUgzPswEzoyiUo8ijBX60zErSSAZogQ4EQ884gYuD0BM27VdoodDfcIfh4X+vOkNtmv6WICkdqmtDxa1sCLGyimRFYQjTa0xYzwkkc75N6WQqEq6UDWY05tw2XI4G9WSpY1/ZXH3FPQd1ucVXeaVv+bo+7jd9ALayCIT6yRX3AAAAAElFTkSuQmCC"
+    type="image/x-icon">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 10;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+
+    .chart-container {
+      max-width: 600px;
+      /* Largeur maximale du conteneur */
+      width: 100%;
+      /* Le conteneur occupe 100% de la largeur disponible */
+      margin: 0 auto;
+      /* Centre horizontalement */
+    }
+
+    canvas {
+      display: block;
+      /* Évite les espaces blancs autour du canvas */
+      max-width: 100%;
+      /* Assure que le canvas ne dépasse pas la largeur du conteneur */
+      height: auto;
+      /* Maintient les proportions */
+    }
+
+    #cameraImage {
+      width: 330px;
+      /* Taille légèrement ajustée pour réduire l'espace */
+      height: auto;
+      /* L'image garde ses proportions */
+      object-fit: contain;
+      /* Ajuste l'image à l'intérieur du conteneur tout en conservant les proportions */
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <h1>Contrôle de la température des radiateurs</h1>
+  <section id="aff_buttons_cam">
+    <button onclick="sendCommand('Down')" id="down" class="gros_bouton"> Down </button>
+    <button onclick="sendCommand('Up')" id="up" class="gros_bouton">Up</button>
+    <button onclick="sendCommand('Excur')" id="excur" class="gros_bouton">Excur</button>
+    <button onclick="sendCommand('Stop')" id="stop" class="gros_bouton">Stop</button>
+    <button onclick="sendCommand('Raz1000')" id="Raz" class="gros_bouton">Raz milieu</button>
+  </section>
+  <button onclick="sendCommand('LED_ON')">Allumer LED</button>
+  <button onclick="sendCommand('LED_OFF')">Éteindre LED</button>
+
+  <div id="data">
+    <h2 style="display:inline;">Données du système</h2>
+    <p style="display:inline; margin-left: 10px;">Render essai</p>
+    <p>T Cycle: <span id="temps_de_cycle">--</span></p>
+    <p>Position: <span id="position">--</span></p>
+    <p>Température radiateur: <span id="temperature">--</span>°C</p>
+    <p>RSSI: <span id="rssi">--</span>%</p>
+    <p> redemarrage: <span id="redemarrage">--</span></p>
+  </div>
+
+  <img id="cameraImage" alt="Image de la caméra">
+
+  <div class="chart-container">
+    <canvas id="myChart" width="600" height="600"></canvas>
+  </div>
+
+  <!-- Boutons pour ajuster le début et la fin de l'affichage -->
+  <div>
+    <h2>Echelle de l'affichage</h2>
+    <button data-mode="1" onclick="changeMode(1)">5 Mn</button>
+    <button data-mode="2" onclick="changeMode(2)">1 H</button>
+    <button data-mode="3" onclick="changeMode(3)">24 H</button>
+  </div>
+
+  <script>
+    let socket;
+    let myChart;
+    var globalBorderColor = 'rgba(75, 192, 192, 1)';  // Couleur par défaut (bleue)
+    var globalBackgroundColor = 'rgba(54, 162, 235, 0.5)';  // Couleur par défaut (bleue)
+
+    window.onload = function () {
+      socket = new WebSocket('wss://render-1-60mw.onrender.com');
+      //socket = new WebSocket('wss://mvdtab.glitch.me');
+
+      socket.onopen = function (e) {
+        sendCommand('démarre');
+        console.log("Connecté au WebSocket");
+      };
+
+      socket.onmessage = function (event) {
+        if (event.data.length < 2000) {
+          //console.log("Données capteurs reçues : ", event.data);
+          //console.log("type",event.type); // Affichera "message"
+          //console.log("target",event.target); // Affiche l'objet WebSocket associé
+          //console.log("origin",event.origin); // Affichera l'URL du serveur WebSocket
+          //console.log("lastEventId",event.lastEventId); // Affichera l'ID du dernier événement (peu courant pour WebSocket)
+          //console.log("ports",event.ports); // Généralement vide pour WebSocket
+
+
+          const data = JSON.parse(event.data);
+          //console.log('Message reçu:', data);
+
+          document.getElementById('temps_de_cycle').textContent = data.temps_de_cycle;
+          document.getElementById('position').textContent = data.position;
+          document.getElementById('temperature').textContent = data.temperature;
+          document.getElementById('rssi').textContent = data.rssi;
+          document.getElementById('redemarrage').textContent = data.restarts;
+
+          if (data.dataTable2) {
+            console.log('data.dataTable2.length:', data.dataTable2.length);
+            // Séparer les données en deux tableaux distincts pour température et position
+            const tempArray = data.dataTable2.map(entry => parseFloat(entry.temperature));
+            const posArray = data.dataTable2.map(entry => parseFloat(entry.position));
+            const timeArray = data.dataTable2.map(entry => entry.time);
+
+            var epsilonTemp = 0.5;  // Epsilon pour température
+            var epsilonPos = 0.1;   // Epsilon pour position
+
+            if (myChart) {
+              // Mise à jour du graphique existant
+              const minTemp = Math.min(...tempArray) - epsilonTemp;
+              const maxTemp = Math.max(...tempArray) + epsilonTemp;
+              const minPos = Math.min(...posArray) - epsilonPos;
+              const maxPos = Math.max(...posArray) + epsilonPos;
+
+              myChart.data.labels = timeArray;
+              // Mise à jour des données de température
+              myChart.data.datasets[0].data = tempArray;
+              myChart.data.datasets[0].borderColor = globalBorderColor;
+              myChart.data.datasets[0].backgroundColor = globalBackgroundColor;
+              // Mise à jour des données de position
+              myChart.data.datasets[1].data = posArray;
+              myChart.data.datasets[1].borderColor = 'rgb(255,0,255)';
+              myChart.data.datasets[1].backgroundColor = 'rgba(255,0,255,0.2)';
+              // Configuration des axes Y
+              myChart.options.scales.y.min = minTemp;
+              myChart.options.scales.y.max = maxTemp;
+              myChart.options.scales.y1.min = minPos;
+              myChart.options.scales.y1.max = maxPos;
+
+              myChart.update();
+            } else {
+              // Création initiale du graphique
+              const ctx = document.getElementById('myChart').getContext('2d');
+              myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: timeArray,
+                  datasets: [
+                    {
+                      label: 'Température (°C)',
+                      data: tempArray,
+                      pointRadius: 0,
+                      borderWidth: 1,
+                      backgroundColor: globalBackgroundColor, // couleur de remplissage (bleu semi-transparent)
+                      borderColor: globalBorderColor,
+                      fill: true,
+                      yAxisID: 'y' // Axe Y principal pour la température
+                    },
+                    {
+                      label: 'Position',
+                      data: posArray,
+                      pointRadius: 0,
+                      borderWidth: 1,
+                      backgroundColor: 'rgba(255,0,255,0.2)',
+                      borderColor: 'rgb(255,0,255)',
+                      fill: true,
+                      yAxisID: 'y1' // Axe Y secondaire pour la position
+                    }
+                  ]
+                },
+                options: {
+                  scales: {
+                    x: {
+                      reverse: true,
+                      title: {
+                        display: true,
+                        text: 'Heure'
+                      }
+                    },
+                    y: {
+                      type: 'linear',
+                      display: true,
+                      position: 'left',
+                      title: {
+                        display: true,
+                        text: 'Température (°C)'
+                      },
+                      beginAtZero: false
+                    },
+                    y1: {
+                      type: 'linear',
+                      display: true,
+                      position: 'right',
+                      title: {
+                        display: true,
+                        text: 'Position 0-10'
+                      },
+                      beginAtZero: false,
+                      grid: {
+                        drawOnChartArea: false // Ne pas afficher la grille pour l'axe Y secondaire
+                      }
+                    }
+                  }
+                }
+              });
+            } //fin my chart
+          }
+
+        } else {
+          const blob = new Blob([event.data], { type: 'image/jpeg' });
+          const imageUrl = URL.createObjectURL(blob);
+          document.getElementById('cameraImage').src = imageUrl;
+          document.getElementById('cameraImage').onload = function () {
+            URL.revokeObjectURL(this.src);
+          }
+        }
+      };
+    };  //fin onload
+
+    function sendCommand(command) {   //fonction envois de commande
+      console.log("Envoi de la commande : " + command);
+      const message = JSON.stringify({ command: command });
+      socket.send(message);
+    }
+
+    function changeMode(mode) {
+      console.log('Mode sélectionné : ' + mode);
+
+      // Sélectionner tous les boutons et réinitialiser leurs styles
+      const buttons = document.querySelectorAll('button[data-mode]');
+      buttons.forEach(btn => {
+        btn.style.border = ''; // Réinitialise la bordure
+        btn.style.backgroundColor = ''; // Réinitialise la couleur de fond
+      });
+
+      // Ajouter le style au bouton sélectionné
+      const selectedButton = document.querySelector(`button[data-mode="${mode}"]`);
+      selectedButton.style.border = '2px solid blue';
+      selectedButton.style.backgroundColor = 'lightblue';
+
+      VarMode = "VarMode=" + mode;
+      sendCommand(VarMode);
+
+      // Changer la couleur en fonction du mode
+      switch (mode) {
+        case 1:
+          globalBorderColor = 'rgba(0, 0, 255, 1)';  // Bleu pour 5 Mn
+          globalBackgroundColor = 'rgba(0, 0, 255 ,0.1)'; // couleur de remplissage (bleu semi-transparent)
+          break;
+        case 2:
+          globalBorderColor = 'rgba(0, 255, 0 ,1)';  // jaune pour 1 H
+          globalBackgroundColor = 'rgba(0, 255, 0 ,0.1)'; // couleur de remplissage (jaune semi-transparent)
+          break;
+        case 3:
+          globalBorderColor = 'rgba(255, 0, 0, 1)';  // Rouge pour 24 H
+          globalBackgroundColor = 'rgba(255, 0, 0 ,0.1)'; // couleur de remplissage (rouge semi-transparent)
+          break;
+        default:
+          globalBorderColor = 'rgba(78, 78, 78, 1)';  // Couleur par défaut
+          globalBackgroundColor = 'rgba(78, 78, 78, 0.1)'; // couleur de remplissage (bleu semi-transparent)
+      }
+    }
+
+  </script>
+</body>
+
+</html>

@@ -51,7 +51,7 @@ class DataTable {
 const dataTable = new DataTable(8640); 
 let lastDataTableSendTime = Date.now(); // Temps du dernier envoi de la DataTable
 let lastAddDataTime = Date.now(); // Temps du dernier envoi de la DataTable
-const DATA_TABLE_INTERVAL = 2000; // 10 secondes
+const DATA_TABLE_INTERVAL = 2000; // 2 secondes raffraichissement de la page
 
 wss.on("connection", (ws) => {
     console.log("Nouvelle connexion établie");
@@ -72,7 +72,7 @@ wss.on("connection", (ws) => {
                 //console.log("data.position:", data.position);
                 //console.log("mode:", ValMode);
                 const currentTime2 = Date.now();
-                if (currentTime2 - lastAddDataTime >= 250) { //10000 delai acquistion 10s
+                if (currentTime2 - lastAddDataTime >= 10000) { //10000 delai acquistion 10s
                     // Mettre à jour le dernier temps d'envoi
                     lastAddDataTime = currentTime2;
                     dataTable.addData(data.temperature, data.position);
