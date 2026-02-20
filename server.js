@@ -213,6 +213,12 @@ wss.on("connection", (ws) => {
     ws.on("close", () => console.log("Client déconnecté"));
 }); //fin connection", (ws)
 
-const listener = server.listen(process.env.PORT, () => {
-    console.log("Votre app écoute sur le port " + listener.address().port);
+//const listener = server.listen(process.env.PORT, () => {
+  //  console.log("Votre app écoute sur le port " + listener.address().port);
+//});
+
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log("Votre app écoute sur le port " + PORT);
 });
